@@ -1,0 +1,44 @@
+<article id="<%= dom_id invoice %>" class="py-6 prose dark:prose-invert">
+    <p class="mb-0 font-semibold">
+      Invoice number
+    </p>
+    <p class="my-0">
+      <%= invoice.invoice_number %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Customer
+    </p>
+    <p class="my-0">
+      <%= invoice.customer_id %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Issue date
+    </p>
+    <p class="my-0">
+      <%= invoice.issue_date %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Due date
+    </p>
+    <p class="my-0">
+      <%= invoice.due_date %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Status
+    </p>
+    <p class="my-0">
+      <%= invoice.status %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Total amount
+    </p>
+    <p class="my-0">
+      <%= invoice.total_amount %>
+    </p>
+
+   <p>
+    <%= link_to "View Invoice", invoice, class: "underline" %>
+  </p>
+
+  <time class="text-slate-600 dark:text-slate-400 text-xs mt-2" datetime="<%= invoice.created_at.to_formatted_s(:long) %>">Created <%= time_ago_in_words(invoice.created_at) + " ago" %></time>
+</article>

@@ -1,0 +1,17 @@
+<div class="nested-fields">
+  <div class="form-group">
+    <%= f.label :product_id, class: "form-label" %>
+    <%= f.collection_select :product_id, @products, :id, :name_with_barcode, prompt: true, class: "form-input" %>
+  </div>
+
+  <div class="form-group">
+    <%= f.label :quantity, class: "form-label" %>
+    <%= f.number_field :quantity, class: "form-input" %>
+  </div>
+  
+  <div class="form-group">
+  <% if f.object.present? %>  
+    <%= link_to_remove_association "Remove Item", f, class: "btn btn-dark text-red" %>
+  <% end %>
+  </div>  
+</div>

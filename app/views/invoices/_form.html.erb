@@ -1,0 +1,51 @@
+<%= form_with(model: @invoice, local: true) do |f| %>
+  <%= render "shared/error_messages", resource: f.object %>
+    <div id="invoice_items">
+      <%= f.fields_for :customer do |customer_form| %>
+        <%= render 'customer_fields', f: customer_form, invoice: @invoice, class: "form-input" %>
+      <% end %>
+    </div>  
+
+    <div class="form-group">
+      <%= f.label :invoice_number, class: "form-label" %>
+      <%= f.number_field :invoice_number, class: "form-input", disabled: true %>
+    </div>
+
+    <div class="form-group">
+      <%= f.label :status, class: "form-label" %>
+      <%= f.select :status, ['pending', 'paid', 'overdue'], prompt: true, class: "form-input" %>
+    </div>
+
+    <div class="mb-4 pb-6 border-b">
+      <h1 class="text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Invoice Items</h1>
+    </div>  
+    
+    <div id="invoice_items">
+    <%= f.fields_for :invoice_items do |invoice_item_form| %>
+        <%= render 'invoice_item_fields', f: invoice_item_form, class: "form-input" %>
+    <% end %>
+    </div>
+
+    <div class="form-group">
+      <%= link_to_add_association 'Add New Item', f, :invoice_items, class: "btn btn-dark" %>
+    </div>
+    
+    <div class="form-group">
+      <%= f.label :total_amount, class: "form-label" %>
+      <%= f.number_field :total_amount, step: 0.01, class: "form-input", disabled: true %>
+    </div>
+  
+    <div class="flex items-center justify-between flex-wrap">
+      <div class="sm:flex-1 sm:mb-0 mb-6">
+        <%= f.submit class: "btn btn-primary" %>
+      </div>
+
+      <% if f.object.new_record? %>
+        <%= link_to "Cancel", invoices_path, class: "btn btn-light" %>
+      <% else %>
+        <%= link_to "Cancel", invoice_path(@invoice), class: "btn btn-light" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  

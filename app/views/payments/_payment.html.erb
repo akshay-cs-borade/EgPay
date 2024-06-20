@@ -1,0 +1,32 @@
+<article id="<%= dom_id payment %>" class="py-6 prose dark:prose-invert">
+    <p class="mb-0 font-semibold">
+      Payment date
+    </p>
+    <p class="my-0">
+      <%= payment.payment_date %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Amount
+    </p>
+    <p class="my-0">
+      <%= payment.amount %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Payment method
+    </p>
+    <p class="my-0">
+      <%= payment.payment_method %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Transaction
+    </p>
+    <p class="my-0">
+      <%= payment.transaction_id %>
+    </p>
+
+   <p>
+    <%= link_to "View Payment", payment, class: "underline" %>
+  </p>
+
+  <time class="text-slate-600 dark:text-slate-400 text-xs mt-2" datetime="<%= payment.created_at.to_formatted_s(:long) %>">Created <%= time_ago_in_words(payment.created_at) + " ago" %></time>
+</article>

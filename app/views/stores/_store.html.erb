@@ -1,0 +1,32 @@
+<article id="<%= dom_id store %>" class="py-6 prose dark:prose-invert">
+    <p class="mb-0 font-semibold">
+      Name
+    </p>
+    <p class="my-0">
+      <%= store.name %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Address
+    </p>
+    <p class="my-0">
+      <%= store.address %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Phone
+    </p>
+    <p class="my-0">
+      <%= store.phone %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Email
+    </p>
+    <p class="my-0">
+      <%= store.email %>
+    </p>
+
+   <p>
+    <%= link_to "View Store", store, class: "underline" %>
+  </p>
+
+  <time class="text-slate-600 dark:text-slate-400 text-xs mt-2" datetime="<%= store.created_at.to_formatted_s(:long) %>">Created <%= time_ago_in_words(store.created_at) + " ago" %></time>
+</article>

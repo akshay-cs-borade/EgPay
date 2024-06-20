@@ -1,0 +1,26 @@
+<article id="<%= dom_id invoice_item %>" class="py-6 prose dark:prose-invert">
+    <p class="mb-0 font-semibold">
+      Quantity
+    </p>
+    <p class="my-0">
+      <%= invoice_item.quantity %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Unit price
+    </p>
+    <p class="my-0">
+      <%= invoice_item.unit_price %>
+    </p>
+    <p class="mb-0 font-semibold">
+      Line total
+    </p>
+    <p class="my-0">
+      <%= invoice_item.line_total %>
+    </p>
+
+   <p>
+    <%= link_to "View Invoice item", invoice_item, class: "underline" %>
+  </p>
+
+  <time class="text-slate-600 dark:text-slate-400 text-xs mt-2" datetime="<%= invoice_item.created_at.to_formatted_s(:long) %>">Created <%= time_ago_in_words(invoice_item.created_at) + " ago" %></time>
+</article>
