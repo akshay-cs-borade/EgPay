@@ -42,4 +42,20 @@ class User < ApplicationRecord
   def has_role?(role_name)
     roles.exists?(name: role_name)
   end
+
+  def short_store_name
+    store&.name.split.map { |word| word[0] }.join()
+  end
+  
+  def admin?
+    roles.first.name.eql?('admin')
+  end
+  
+  def super_admin?
+    roles.first.name.eql?('super_admin')
+  end
+
+  def store_manager?
+    roles.first.name.eql?('store_manager')
+  end
 end

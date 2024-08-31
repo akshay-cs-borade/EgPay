@@ -59,6 +59,12 @@ class CustomersController < ApplicationController
     end
   end
 
+  def search
+    customers = Customer.where(store_id: current_user.store_id, phone: params[:customer_phone][:term])
+    suggestions = customers.map { |cust| { id: cust.id, text: cust.name_with_phone }}
+    render json: { suggestions: suggestions }
+  end  
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_customer

@@ -26,9 +26,9 @@ class Customer < ApplicationRecord
   belongs_to :store
   has_many :invoices
 
-  validates :name, :phone, :address, presence: true
+  validates :name, :phone, presence: true
 
   def name_with_phone
-    "#{name} #{phone}"
+    "#{phone}, #{name}"
   end  
 end

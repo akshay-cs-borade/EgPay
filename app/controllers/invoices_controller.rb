@@ -25,33 +25,45 @@ class InvoicesController < ApplicationController
 
   # GET /invoices/new
   def new
-    @invoice = Invoice.new
+    @invoice = Invoice.new(invoice_number: "RMW-#{Time.now.utc.to_i}")
+    @store_name = current_user&.store&.name
     @invoice.invoice_items.build
-    @customers = Customer.where(store_id: current_user.store_id)
-    @products = Product.joins(:barcode).where(store_id: current_user.store_id)
+    @barcodes = Barcode.where(store_id: current_user.store_id)
   end
 
   # GET /invoices/1/edit
   def edit
-    @customers = Customer.all
-    @products = Product.all
+    @customer = @invoice.customer
+    @barcodes = Barcode.where(store_id: current_user.store_id)
   end
 
   # POST /invoices or /invoices.json
   def create
     @invoice = Invoice.new(invoice_params)
-    respond_to do |format|
-      @invoice.store = current_user.store
-      if @invoice.save
-        format.html { redirect_to invoice_url(@invoice), notice: "Invoice was successfully created." }
-        format.json { render :show, status: :created, location: @invoice }
-      else
-        @customers = Customer.all
-        @products = Product.all
-        format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @invoice.errors, status: :unprocessable_entity }
+
+    customer = Customer.where(phone: invoice_customer_params[:phone]).first_or_initialize
+    customer.name = invoice_customer_params[:name]
+    if customer.save  
+      respond_to do |format|
+        @invoice.store = current_user.store
+        @invoice.customer_id = customer.id
+        if @invoice.save
+          format.html { redirect_to invoice_url(@invoice), notice: "Invoice was successfully created." }
+          format.json { render :show, status: :created, location: @invoice }
+        else
+          @customers = Customer.where(store_id: current_user.store_id)
+          @products = Product.joins(:barcode).where(store_id: current_user.store_id)
+          format.html { render :new, status: :unprocessable_entity }
+          format.json { render json: @invoice.errors, status: :unprocessable_entity }
+        end
       end
-    end  
+    else
+      @invoice.errors.add(:base, customer.error_messages)
+      @customers = Customer.where(store_id: current_user.store_id)
+      @products = Product.joins(:barcode).where(store_id: current_user.store_id)
+      format.html { render :new, status: :unprocessable_entity }
+      format.json { render json: @customer.errors, status: :unprocessable_entity }
+    end        
   end
 
   # PATCH/PUT /invoices/1 or /invoices/1.json
@@ -89,6 +101,10 @@ class InvoicesController < ApplicationController
     # end
 
     def invoice_params
-      params.require(:invoice).permit(:customer_id, :issue_date, :due_date, :status, :total_amount, invoice_items_attributes: [:product_id, :quantity, :unit_price, :line_total])
+      params.require(:invoice).permit(:status, invoice_items_attributes: [:id, :product_id, :quantity, :_destroy])
     end
+
+    def invoice_customer_params
+      params[:invoice].require(:customer).permit(:name, :phone) 
+    end  
 end

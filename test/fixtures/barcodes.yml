@@ -7,14 +7,17 @@
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  product_id     :integer          not null
+#  store_id       :integer
 #
 # Indexes
 #
 #  index_barcodes_on_product_id  (product_id)
+#  index_barcodes_on_store_id    (store_id)
 #
 # Foreign Keys
 #
 #  product_id  (product_id => products.id)
+#  store_id    (store_id => stores.id)
 #
 
 # This model initially had no columns defined. If you add columns to the

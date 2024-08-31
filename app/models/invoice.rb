@@ -25,10 +25,12 @@
 #
 class Invoice < ApplicationRecord
     self.per_page = 5
-
+    
     belongs_to :customer
     belongs_to :store
     has_many :invoice_items, dependent: :destroy
     has_many :products, through: :invoice_items
-    has_many :payments, dependent: :destroy
+    has_many :payments, dependent: :destroy    
+    
+    accepts_nested_attributes_for :invoice_items, allow_destroy: true, reject_if: :all_blank
 end

@@ -1,6 +1,8 @@
-<li>
-  <%= nav_link_to "Dashboard", send("root_path"), class: "nav-link" %>
-</li>
+<% if current_user.super_admin? %>
+  <li>
+    <%= nav_link_to "Dashboard", send("root_path"), class: "nav-link" %>
+  </li>
+<% end %>
 <li>
   <%= nav_link_to "Customers", customers_path, class: "nav-link" %>
 </li>

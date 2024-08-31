@@ -1,8 +1,10 @@
 <%= render "shared/admin/nav", { header_title: "Products" } do %>
   <div data-controller="dropdown">
-    <div class="flex items-center justify-end">
-      <%= link_to "New Product", new_product_path, class: "btn btn-primary" %>
-    </div>
+    <% unless current_user.store_manager? %>
+      <div class="flex items-center justify-end">
+        <%= link_to "New Product", new_product_path, class: "btn btn-primary" %>
+      </div>
+    <% end %>  
   </div>
 <% end %>
 

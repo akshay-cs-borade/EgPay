@@ -8,7 +8,11 @@ Rails.application.routes.draw do
       get 'pdf', to: 'invoices#show', defaults: { format: 'pdf' }
     end
   end
-  resources :customers
+  resources :customers do
+    collection do
+      post 'search'
+    end   
+  end   
 	get 'admin/integrations', to: 'page#integrations'
 	get 'admin/team', to: 'page#team'
 	get 'admin/billing', to: 'page#billing'
