@@ -1,0 +1,19 @@
+<div class="nested-fields">
+  <div class="field">
+    <%= f.label :color_id, "Color" %>
+    <%= f.collection_select :color_id, Color.all, :id, :name, prompt: "Select Color" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :size_id, "Size" %>
+    <%= f.collection_select :size_id, Size.all, :id, :name, prompt: "Select Size" %>
+  </div>
+
+  <div class="field">
+    <%= f.label :price, "Variant Price" %>
+    <%= f.number_field :price, step: 0.01 %>
+  </div>
+
+  <%= f.hidden_field :_destroy %>
+  <%= link_to "Remove Variant", 'javascript:void(0);', class: "remove_fields" %>
+</div>

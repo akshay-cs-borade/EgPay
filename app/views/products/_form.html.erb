@@ -21,6 +21,38 @@
     <%= form.number_field :quantity_available, class: "form-input" %>
   </div>
 
+  <h3>Product Variants</h3>
+  <div id="product_variants">
+    <%= form.fields_for :product_variants do |variant_form| %>
+      <div class="nested-fields">
+        <div class="field">
+          <%= variant_form.label :color_id, "Color" %>
+          <%= variant_form.collection_select :color_id, Color.all, :id, :name, prompt: "Select Color" %>
+        </div>
+
+        <div class="field">
+          <%= variant_form.label :size_id, "Size" %>
+          <%= variant_form.collection_select :size_id, Size.all, :id, :name, prompt: "Select Size" %>
+        </div>
+
+        <div class="field">
+          <%= variant_form.label :price, "Variant Price" %>
+          <%= variant_form.number_field :price, step: 0.01 %>
+        </div>
+
+        <%= variant_form.hidden_field :_destroy %>
+        <%= link_to "Remove Variant", 'javascript:void(0);', class: "remove_fields" %>
+      </div>
+    <% end %>
+    <%= link_to "Add Variant", '#', class: "add_fields", data: { 
+      id: form.object.object_id, 
+      fields: 
+        form.fields_for(:product_variants, ProductVariant.new, child_index: "new_product_variants") do |builder|
+          render('product_variant_fields', f: builder)
+        end 
+    } %>
+  </div>
+
   <div class="flex items-center justify-between flex-wrap">
     <div class="sm:flex-1 sm:mb-0 mb-6">
       <%= form.submit class: "btn btn-primary" %>

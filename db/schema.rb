@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_20_181641) do
+ActiveRecord::Schema[7.1].define(version: 2024_09_01_115320) do
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
     t.text "body"
@@ -59,6 +59,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_181641) do
     t.index ["store_id"], name: "index_barcodes_on_store_id"
   end
 
+  create_table "colors", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "customers", force: :cascade do |t|
     t.string "name"
     t.string "email"
@@ -72,14 +78,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_181641) do
 
   create_table "invoice_items", force: :cascade do |t|
     t.integer "invoice_id", null: false
-    t.integer "product_id", null: false
+    t.integer "product_variant_id", null: false
     t.integer "quantity"
     t.decimal "unit_price"
     t.decimal "line_total"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["invoice_id"], name: "index_invoice_items_on_invoice_id"
-    t.index ["product_id"], name: "index_invoice_items_on_product_id"
+    t.index ["product_variant_id"], name: "index_invoice_items_on_product_variant_id"
   end
 
   create_table "invoices", force: :cascade do |t|
@@ -109,6 +115,18 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_181641) do
     t.index ["store_id"], name: "index_payments_on_store_id"
   end
 
+  create_table "product_variants", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.integer "color_id", null: false
+    t.integer "size_id", null: false
+    t.decimal "price", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["color_id"], name: "index_product_variants_on_color_id"
+    t.index ["product_id"], name: "index_product_variants_on_product_id"
+    t.index ["size_id"], name: "index_product_variants_on_size_id"
+  end
+
   create_table "products", force: :cascade do |t|
     t.string "name"
     t.text "description"
@@ -125,6 +143,12 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_181641) do
   end
 
   create_table "roles", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "sizes", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -170,7 +194,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_20_181641) do
   add_foreign_key "barcodes", "stores"
   add_foreign_key "customers", "stores"
   add_foreign_key "invoice_items", "invoices"
-  add_foreign_key "invoice_items", "products"
+  add_foreign_key "invoice_items", "product_variants"
   add_foreign_key "invoices", "customers"
   add_foreign_key "invoices", "stores"
   add_foreign_key "payments", "invoices"

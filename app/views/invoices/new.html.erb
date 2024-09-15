@@ -346,10 +346,18 @@
     border-color: #007bff;
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
   }
+
+  .qr-container{
+    display: none;
+  }
+
+  .product-drop span {
+    min-width: 120px;
+    b { left: 90% !important; }
+  }
 </style>
 
 <%= render "shared/admin/nav", { header_title: "" } %>
-
 <div class="max-w-3xl mx-auto px-4 my-16">
   <div class="mb-4 pb-6 border-b">
     <nav aria-label="breadcrumb" class="my-6 font-medium flex text-slate-500 dark:text-slate-200 text-sm">
@@ -393,8 +401,8 @@
           <td><span><%= Date.today.strftime("%d/%m/%Y") %></span></td>
         </tr>
         <tr>
-          <th><span>Amount Due</span></th>
-          <td><span id="prefix">₹ </span><span></span></td>
+          <th><span>Due</span></th>
+          <td><span>₹ </span><span id="amount-due">00.00</span></td>
         </tr>
       </table>
       <table class="inventory">
@@ -407,42 +415,47 @@
             <th><span>Price</span></th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="inventory-tbody">
           <tr>
-            <td><a class="cut">-</a><span></span></td>
-            <td><span>-</span></td>
-            <td><span data-prefix>₹ </span><span>10</span></td>
-            <td><span contenteditable>0</span></td>
-            <td><span data-prefix>₹ </span><span></span></td>
+            <td class="pro-name">
+              <a class="cut">-</a>
+              <div class="product-drop">
+                <select name="product" class="products"></select>
+              </div>
+              <span class="pro-name-span">-</span>  
+            </td>
+            <td class="pro-desc"><span class="pro-desc-span">-</span></td>
+            <td class="pro-rate"><span>₹</span><span class="pro-rate-span" data-prefix>00.00</span></td>
+            <td class="pro-quantity"><span>1</span></td>
+            <td class="pro-total"><span>₹</span><span class="pro-total-span" data-prefix>00.00</span></td>
           </tr>
         </tbody>
       </table>
       <a class="add">+</a>
       <table class="balance">
         <tr>
-          <th><span contenteditable>Total</span></th>
-          <td><span data-prefix>₹ </span><span>600.00</span></td>
+          <th><span>(Due + Total)</span></th>
+          <td><span>₹ </span><span data-prefix>00.00</span></td>
         </tr>
         <tr>
-          <th><span contenteditable>Amount Paid</span></th>
-          <td><span data-prefix>₹ </span><span contenteditable>0.00</span></td>
+          <th><span>Amount Paid</span></th>
+          <td><span>₹ </span><span data-prefix contenteditable>00.00</span></td>
         </tr>
         <tr>
-          <th><span contenteditable>Balance Due</span></th>
-          <td><span data-prefix>₹ </span><span>600.00</span></td>
+          <th><span>Balance Due</span></th>
+          <td><span>₹ </span><span data-prefix>00.00</span></td>
         </tr>
       </table>
     </article>
     <aside>
-      <h1><span contenteditable>Additional Notes</span></h1>
-      <div contenteditable>
+      <h1><span>Additional Notes</span></h1>
+      <div>
         <p>A finance charge of 1.5% will be made on unpaid balances after 30 days.</p>
       </div>
     </aside>
     <% end %>
   </div>
 </div>
-
 <script>
 (function (document) {
 	var
@@ -507,21 +520,60 @@
 
 /* Helper Functions
 /* ========================================================================== */
+function initializeSelect2() {
+    $("#inventory-tbody .products").select2({
+      minimumInputLength: 3,
+      ajax: {
+        url: "/products/search",
+        dataType: 'json',
+        type: "POST",
+        delay: 50,
+        data: function (params) {
+          return {
+            product_barcode: params.term // 'params.term' is the user input
+          };
+        },
+        processResults: function (data) {
+          return {
+            results: data.suggestions
+          };
+        },
+        error: function (xhr, status, error) {
+          console.error("An error occurred while fetching customer data:", error);
+        }
+      },
+      templateSelection: function formatRepoSelection(data) {
+        selected_row = $(data.element).parents()[3];
+        var control = $(selected_row)
+        control.find('.pro-name .pro-name-span').text(data.text)
+        control.find('.pro-desc .pro-desc-span').text(data.description)
+        control.find('.pro-rate .pro-rate-span').text(data.price)
+
+        let selections = data.text.split(',');
+        if (selections[1]) {
+          $('#customer-name').val(selections[1]);
+        }
+        return selections[0];
+      },
+      tags: false
+    });
+  }
 
 function generateTableRow() {
 	var emptyColumn = document.createElement('tr');
 
-	emptyColumn.innerHTML = '<td><a class="cut">-</a><span></span></td>' +
-		'<td><span>-</span></td>' +
-		'<td><span data-prefix>₹ </span><span>10.00</span></td>' +
-		'<td><span contenteditable>0</span></td>' +
-		'<td><span data-prefix>₹ </span><span>0.00</span></td>';
+	emptyColumn.innerHTML = '<td class="pro-name"><a class="cut">-</a><div class="product-drop"><select name="product" class="products"></select></div><span class="pro-name-span"></span></td>' +
+		'<td class="pro-desc"><span class="pro-desc-span">-</span></td>' +
+		'<td class="pro-rate"><span>₹ </span><span class="pro-rate-span" data-prefix>00.00</span></td>' +
+		'<td class="pro-quantity"><span>1</span></td>' +
+		'<td class="pro-total"><span>₹ </span><span class="pro-total-span" data-prefix>0.00</span></td>';
 
 	return emptyColumn;
 }
 
 function parseFloatHTML(element) {
-	return parseFloat(element.innerHTML.replace(/[^\d\.\-]+/g, '')) || 0;
+	num = parseFloat(element.innerHTML.replace(/[^\d\.\-]+/g, '')) || 0;
+  return Math.round((num + Number.EPSILON) * 100) / 100
 }
 
 function parsePrice(number) {
@@ -560,41 +612,25 @@ function updateInvoice() {
 	// ======================
 
 	for (var a = document.querySelectorAll('table.inventory tbody tr'), i = 0; a[i]; ++i) {
-		// get inventory row cells
-		cells = a[i].querySelectorAll('span:last-child');
-
-		// set price as cell[2] * cell[3]
-		price = parseFloatHTML(cells[2]) * parseFloatHTML(cells[3]);
-
-		// add price to total
-		total += price;
-
-		// set row total
-		cells[4].innerHTML = price;
+    rate = $(a[i]).find('.pro-rate-span')[0]
+    quantity = $(a[i]).find('.pro-quantity')[0]
+    price = Math.round((parseFloatHTML(rate) * parseFloatHTML(quantity)) * 100) / 100;
+    total += price;
+    $(a[i]).find('.pro-total-span').text(price);
 	}
 
-	// update balance cells
-	// ====================
+  // Amount Due
+  amount_due = parseFloatHTML($('#amount-due')[0])
 
 	// get balance cells
 	cells = document.querySelectorAll('table.balance td:last-child span:last-child');
 
 	// set total
-	cells[0].innerHTML = total;
+  total = Math.round(((total + amount_due) + Number.EPSILON) * 100) / 100
+	$(cells[0]).text(total);
 
 	// set balance and meta balance
-	cells[2].innerHTML = document.querySelector('table.meta tr:last-child td:last-child span:last-child').innerHTML = parsePrice(total - parseFloatHTML(cells[1]));
-
-	// update prefix formatting
-	// ========================
-
-	var prefix = document.querySelector('#prefix').innerHTML;
-	for (a = document.querySelectorAll('[data-prefix]'), i = 0; a[i]; ++i) a[i].innerHTML = prefix;
-
-	// update price formatting
-	// =======================
-
-	for (a = document.querySelectorAll('span[data-prefix] + span'), i = 0; a[i]; ++i) if (document.activeElement != a[i]) a[i].innerHTML = parsePrice(parseFloatHTML(a[i]));
+  cells[2].innerHTML =  parsePrice(total - parseFloatHTML(cells[1]));
 }
 
 /* On Content Load
@@ -614,8 +650,8 @@ function onContentLoad() {
 
 		if (e.target.matchesSelector('.add')) {
 			document.querySelector('table.inventory tbody').appendChild(generateTableRow());
-		}
-		else if (e.target.className == 'cut') {
+      initializeSelect2()
+		} else if (e.target.className == 'cut') {
 			row = e.target.ancestorQuerySelector('tr');
 
 			row.parentNode.removeChild(row);
@@ -682,42 +718,42 @@ window.addEventListener && document.addEventListener('DOMContentLoaded', onConte
 
 
   $(document).ready(function () {
-      // Trigger AJAX request on content change
-      $("#customer-phone").select2({
-        minimumInputLength: 10,
-        ajax: {
-          url: "/customers/search",
-          dataType: 'json',
-          type: "POST",
-          quietMillis: 50,
-          data: function (term) {
-              return {
-                customer_phone: term
-              };
-          },
-          processResults: function (data) {
+    // Trigger AJAX request on content change
+    $("#customer-phone").select2({
+      minimumInputLength: 10,
+      ajax: {
+        url: "/customers/search",
+        dataType: 'json',
+        type: "POST",
+        quietMillis: 50,
+        data: function (term) {
             return {
-              results: data.suggestions
+              customer_phone: term
             };
-          }
         },
-        templateSelection: function formatRepoSelection (data) {
-          selections = data.text.split(',')
-          if(selections[1]){
-            $('#customer-name').val(selections[1]);
-          }
-          
-          return selections[0];
-        },
-        tags: true
-      });
-
-      $.ajaxSetup({
-        headers: {
-          'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+        processResults: function (data) {
+          return {
+            results: data.suggestions
+          };
         }
-      });
+      },
+      templateSelection: function formatRepoSelection (data) {
+        selections = data.text.split(',')
+        if(selections[1]){
+          $('#customer-name').val(selections[1]);
+        }
+        
+        return selections[0];
+      },
+      tags: true
     });
-    
-    
+
+    $.ajaxSetup({
+      headers: {
+        'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+      }
+    });
+
+    initializeSelect2();
+  });
 </script>

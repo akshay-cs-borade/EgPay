@@ -27,6 +27,9 @@ class Customer < ApplicationRecord
   has_many :invoices
 
   validates :name, :phone, presence: true
+  validates :phone,:presence => true,
+                 :numericality => true,
+                 :length => { :minimum => 10, :maximum => 15 }
 
   def name_with_phone
     "#{phone}, #{name}"

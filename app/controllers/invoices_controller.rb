@@ -33,6 +33,9 @@ class InvoicesController < ApplicationController
 
   # GET /invoices/1/edit
   def edit
+    @store_name = current_user&.store&.name
+    @invoice.invoice_items.build
+    @barcodes = Barcode.where(store_id: current_user.store_id)
     @customer = @invoice.customer
     @barcodes = Barcode.where(store_id: current_user.store_id)
   end
@@ -88,6 +91,41 @@ class InvoicesController < ApplicationController
       format.json { head :no_content }
     end
   end
+
+  def connect_whatsapp
+    # Set up the connection
+    url = 'http://localhost:3001/login'
+    conn = Faraday.new(url) do |faraday|
+      faraday.request :json # Encode request as JSON
+      faraday.adapter Faraday.default_adapter
+    end
+
+    # Make the POST request
+    response = conn.post do |req|
+      req.headers['Content-Type'] = 'application/json'
+      req.body = { username: 'user1', password: 'password1' }
+    end
+
+    auth_token = JSON.parse(response.body)["token"]
+
+    # Set up the connection
+    url = 'http://localhost:3001/connect_wp'
+    conn = Faraday.new(url) do |faraday|
+      faraday.request :json # Encode request as JSON
+    end
+
+    # Make the POST request
+    response = conn.post do |req|
+      req.headers['Authorization'] = "Bearer #{auth_token}"
+      req.headers['Content-Type'] = 'application/json'
+      req.body = { phone: '919926826894' }
+    end
+    result = JSON.parse(response.body)
+
+    respond_to do |format|
+      format.json { render json: {qr: result["qr"], message: result["message"]}, status: :ok }
+    end  
+  end  
 
   private
     # Use callbacks to share common setup or constraints between actions.

@@ -31,10 +31,21 @@ class Product < ApplicationRecord
     belongs_to :user
     belongs_to :store
     has_one :barcode
-    has_many :invoice_items, dependent: :destroy
-    has_many :invoices, through: :invoice_items
+    has_many :product_variants, dependent: :destroy
+    has_many :colors, through: :product_variants
+    has_many :sizes, through: :product_variants
+
+    accepts_nested_attributes_for :product_variants, allow_destroy: true
 
     def name_with_barcode
       "#{name} #{barcode.barcode_number}"
     end
+
+    def generate_barcode(size, type)
+      # Get the current time in UTC as a unique integer
+      timestamp = Time.now.utc.strftime("%H%M%S%L")
+      
+      # Construct the barcode
+      barcode = "RMW-#{timestamp}#{id}-#{size.upcase}-#{type}"
+    end  
 end

@@ -23,6 +23,8 @@ class ProductsController < ApplicationController
   # POST /products or /products.json
   def create
     @product = Product.new(product_params)
+    @product.user_id = current_user.id 
+    @product.store_id = current_user.store.id
 
     respond_to do |format|
       if @product.save
@@ -58,6 +60,13 @@ class ProductsController < ApplicationController
     end
   end
 
+  def search
+    products = Product.joins(:barcode).where("products.store_id = ? AND barcodes.barcode_number LIKE ?", current_user.store_id, "%#{params[:product_barcode]}%")
+    
+    suggestions = products.map { |product| { id: product.id, text: product.name, description: product.description, price: product&.price&.to_f }}
+    render json: { suggestions: suggestions }
+  end
+
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_product
@@ -66,6 +75,9 @@ class ProductsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def product_params
-      params.require(:product).permit(:name, :description, :price, :quantity_available)
+      params.require(:product).permit(
+        :name, :description, :price, :quantity_available, :user_id, :store_id,
+        product_variants_attributes: [:id, :color_id, :size_id, :price, :_destroy]
+      )
     end
 end

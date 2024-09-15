@@ -1,0 +1,28 @@
+# == Schema Information
+#
+# Table name: product_variants
+#
+#  id         :integer          not null, primary key
+#  price      :decimal(, )      not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  color_id   :integer          not null
+#  product_id :integer          not null
+#  size_id    :integer          not null
+#
+# Indexes
+#
+#  index_product_variants_on_color_id    (color_id)
+#  index_product_variants_on_product_id  (product_id)
+#  index_product_variants_on_size_id     (size_id)
+#
+
+# This model initially had no columns defined. If you add columns to the
+# model remove the "{}" from the fixture names and add the columns immediately
+# below each fixture, per the syntax in the comments below
+#
+one: {}
+# column: value
+#
+two: {}
+# column: value

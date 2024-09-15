@@ -2,11 +2,18 @@ Rails.application.routes.draw do
   resources :stores
   resources :payments
   resources :invoice_items
-  resources :products
+  resources :products do
+    collection do
+      post 'search' 
+    end  
+  end   
   resources :invoices do
     member do
       get 'pdf', to: 'invoices#show', defaults: { format: 'pdf' }
     end
+    collection do
+      get 'connect_whatsapp'
+    end   
   end
   resources :customers do
     collection do
@@ -48,4 +55,5 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+  mount ActionCable.server => '/cable'
 end
