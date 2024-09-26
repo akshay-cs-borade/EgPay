@@ -3,6 +3,7 @@
 # Table name: invoices
 #
 #  id             :integer          not null, primary key
+#  balance_amount :decimal(10, 2)
 #  due_date       :date
 #  invoice_number :string
 #  issue_date     :date

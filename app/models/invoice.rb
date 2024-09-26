@@ -3,6 +3,7 @@
 # Table name: invoices
 #
 #  id             :integer          not null, primary key
+#  balance_amount :decimal(10, 2)
 #  due_date       :date
 #  invoice_number :string
 #  issue_date     :date
@@ -25,6 +26,7 @@
 #
 class Invoice < ApplicationRecord
     self.per_page = 5
+    validates :total_amount, numericality: { greater_than_or_equal_to: 0 }
     
     belongs_to :customer
     belongs_to :store
